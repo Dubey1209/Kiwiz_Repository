@@ -200,16 +200,16 @@ const ExploreGallery = () => {
           </div>
         </div>
 
-        {/* Gallery Grid - Reels Style */}
-        <div className="space-y-4 max-w-md mx-auto px-4">
+        {/* Gallery Grid - 3 Column Layout */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-4 max-w-7xl mx-auto">
           {filteredItems.map((item, index) => (
             <div 
               key={item.id} 
               ref={index === filteredItems.length - 1 ? lastItemRef : null}
-              className="relative group"
+              className="relative group w-full"
             >
-              <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="relative aspect-[2/3] bg-muted/50">
+              <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
+                <div className="relative aspect-[2/3] bg-muted/50 flex-shrink-0">
                   <img 
                     src={`https://picsum.photos/300/450?random=${item.id}`}
                     alt={item.title}
@@ -273,16 +273,16 @@ const ExploreGallery = () => {
             </div>
           ))}
           
-          {/* Loading indicator */}
+          {/* Loading indicator - spans full width */}
           {loading && (
-            <div className="flex justify-center py-8">
+            <div className="col-span-1 sm:col-span-2 lg:col-span-3 flex justify-center py-8">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
             </div>
           )}
           
-          {/* No more items */}
+          {/* No more items - spans full width */}
           {!hasMore && (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="col-span-1 sm:col-span-2 lg:col-span-3 text-center py-8 text-muted-foreground">
               You've reached the end of the gallery!
             </div>
           )}
