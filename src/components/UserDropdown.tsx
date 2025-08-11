@@ -44,6 +44,8 @@ export const UserDropdown = () => {
               <p className="text-xs text-white/80 truncate">{user.email}</p>
             </div>
             
+
+            
             <Link
               to="/profile"
               className="flex items-center px-4 py-2 text-sm text-white hover:bg-[#A8A9D9] transition-colors"
@@ -51,15 +53,6 @@ export const UserDropdown = () => {
             >
               <User className="w-4 h-4 mr-3" />
               My Profile
-            </Link>
-            
-            <Link
-              to="/settings"
-              className="flex items-center px-4 py-2 text-sm text-white hover:bg-[#A8A9D9] transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              <Settings className="w-4 h-4 mr-3" />
-              Settings
             </Link>
             
             <div className="border-t border-[#A8A9D9] my-1"></div>

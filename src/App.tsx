@@ -17,6 +17,7 @@ import Login from "./pages/Login";
 import BillingPlans from "./pages/BillingPlans";
 import ContactUs from "./pages/ContactUs";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <MyLibrary />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="profile" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <Profile />
             </ProtectedRoute>
           } 
         />
