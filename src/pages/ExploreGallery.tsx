@@ -200,8 +200,8 @@ const ExploreGallery = () => {
           </div>
         </div>
 
-        {/* Gallery Grid - 5 Column Layout */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 px-4 max-w-7xl mx-auto">
+        {/* Gallery Grid - 3 Column Layout */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 px-4 max-w-5xl mx-auto">
           {filteredItems.map((item, index) => (
             <div 
               key={item.id} 
