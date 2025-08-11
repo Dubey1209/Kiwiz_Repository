@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate, NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Home, Palette, Upload, BookOpen, Heart, LogOut } from "lucide-react";
+import { Menu, X, Home, Palette, Upload, BookOpen, Heart, LogOut, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserSidebar } from "./UserSidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserDropdown } from "./UserDropdown";
+import { ThemeToggle } from "./ThemeToggle";
 
 const Layout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -59,11 +60,13 @@ const Layout = () => {
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-2 md:gap-6">
             {/* Logo */}
-            <NavLink to="/" className="flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center">
+            <NavLink to="/" className="flex items-center group">
+              <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center transition-all duration-300 group-hover:opacity-90">
                 <span className="text-white font-bold text-lg">✦</span>
               </div>
-              <span className="ml-2 text-xl font-bold hidden sm:inline">Kiwiz</span>
+              <span className="ml-2 text-xl font-bold hidden sm:inline bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Kiwiz
+              </span>
             </NavLink>
 
             {/* Desktop Navigation - Show public items to all, add Upload for authenticated */}
@@ -110,11 +113,12 @@ const Layout = () => {
           <div className="flex items-center gap-2">
             {isAuthenticated ? (
               <>
-                {/* Desktop - User Dropdown */}
-                <div className="hidden md:flex items-center gap-4">
+                {/* User Dropdown - Desktop */}
+                <div className="hidden md:flex items-center gap-2">
                   <UserDropdown />
                 </div>
-                
+                {/* Theme Toggle */}
+                <ThemeToggle />
                 {/* Mobile Menu Button */}
                 <Button
                   variant="ghost"
@@ -128,30 +132,26 @@ const Layout = () => {
               </>
             ) : (
               <>
-                {/* Desktop - Auth Buttons */}
-                <div className="hidden md:flex items-center gap-3">
-                  <NavLink to="/login">
-                    <Button variant="ghost" className="text-sm">
-                      Sign In
-                    </Button>
-                  </NavLink>
-                  <NavLink to="/auth">
-                    <Button className="text-sm">
-                      Create Account
-                    </Button>
-                  </NavLink>
+                <div className="flex items-center gap-2">
+                  <ThemeToggle />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  >
+                    {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
                 </div>
-                
-                {/* Mobile Menu Button */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden"
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                >
-                  {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                  <span className="sr-only">Toggle menu</span>
-                </Button>
+                <div className="hidden md:flex items-center gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>
+                    Sign In
+                  </Button>
+                  <Button size="sm" onClick={() => navigate('/auth')}>
+                    Sign Up
+                  </Button>
+                </div>
               </>
             )}
           </div>
