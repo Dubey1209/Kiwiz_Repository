@@ -200,8 +200,8 @@ const ExploreGallery = () => {
           </div>
         </div>
 
-        {/* Gallery Grid - 3 Column Layout */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-4 max-w-7xl mx-auto">
+        {/* Gallery Grid - 5 Column Layout */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 px-4 max-w-7xl mx-auto">
           {filteredItems.map((item, index) => (
             <div 
               key={item.id} 
@@ -275,14 +275,14 @@ const ExploreGallery = () => {
           
           {/* Loading indicator - spans full width */}
           {loading && (
-            <div className="col-span-1 sm:col-span-2 lg:col-span-3 flex justify-center py-8">
+            <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5 flex justify-center py-8">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
             </div>
           )}
           
           {/* No more items - spans full width */}
           {!hasMore && (
-            <div className="col-span-1 sm:col-span-2 lg:col-span-3 text-center py-8 text-muted-foreground">
+            <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5 text-center py-8 text-muted-foreground">
               You've reached the end of the gallery!
             </div>
           )}
