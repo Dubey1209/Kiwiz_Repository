@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 const TracingStudio = () => {
   const [activeCategory, setActiveCategory] = useState("alphabet");
   const [selectedItem, setSelectedItem] = useState("A");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const { toast } = useToast();
 
   const categories = [
@@ -42,6 +44,22 @@ const TracingStudio = () => {
       title: "Playing Sound",
       description: `Listen to the pronunciation of "${selectedItem}"`,
     });
+  };
+
+  const handleGenerate = () => {
+    setIsGenerating(true);
+    // Simulate generation delay
+    setTimeout(() => {
+      // In a real app, you would generate or fetch the actual image here
+      // For now, we'll use a placeholder
+      setGeneratedImage(`https://placehold.co/600x200/4F46E5/FFFFFF?text=${selectedItem}+Tracing+Worksheet`);
+      setIsGenerating(false);
+      
+      toast({
+        title: "Generation Complete",
+        description: `Your ${selectedItem} tracing worksheet is ready!`,
+      });
+    }, 1500);
   };
 
   return (
@@ -146,19 +164,30 @@ const TracingStudio = () => {
                 </p>
               </div>
 
-              {/* Practice Lines */}
+              {/* Generate Button and Preview Area */}
               <div className="space-y-4 mb-6">
-                <h4 className="text-lg font-semibold text-foreground">Practice Lines</h4>
-                {[1, 2, 3].map((line) => (
-                  <div key={line} className="flex items-center space-x-4 p-4 bg-secondary/20 rounded-xl">
-                    <span className="text-sm text-muted-foreground w-8">{line}.</span>
-                    <div className="flex-1 border-b-2 border-dashed border-primary/40 h-12 flex items-center">
-                      <div className="text-4xl font-bold text-primary/40 pl-4">
-                        {selectedItem}
-                      </div>
+                <div className="flex justify-between items-center">
+                  <h4 className="text-lg font-semibold text-foreground">Generate Worksheet</h4>
+                  <Button 
+                    onClick={handleGenerate}
+                    disabled={isGenerating}
+                    className="bg-primary hover:bg-primary/90 transition-colors"
+                  >
+                    {isGenerating ? 'Generating...' : 'Generate'}
+                  </Button>
+                </div>
+                
+                {generatedImage && (
+                  <div className="bg-secondary/10 rounded-xl p-4 border border-border">
+                    <div className="aspect-video bg-background rounded-lg overflow-hidden flex items-center justify-center">
+                      <img 
+                        src={generatedImage} 
+                        alt={`Generated ${selectedItem} tracing worksheet`}
+                        className="max-w-full max-h-48 object-contain"
+                      />
                     </div>
                   </div>
-                ))}
+                )}
               </div>
 
               {/* Action Buttons */}
