@@ -157,7 +157,7 @@ const LearningStudio = () => {
           <button
             key={item}
             onClick={() => handleTracingSelect(item)}
-            className="flex items-center justify-center text-5xl p-4 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-100 transition-colors"
+            className="flex items-center justify-center text-5xl p-4 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 dark:text-gray-100 dark:border-gray-700 transition-colors"
           >
             {item}
           </button>
@@ -195,7 +195,7 @@ const LearningStudio = () => {
             <Badge 
               key={index}
               variant="outline"
-              className="cursor-pointer hover:bg-primary/10 dark:hover:bg-primary/30 text-base py-1.5 px-3 dark:border-gray-500 dark:text-white dark:bg-gray-700"
+              className="cursor-pointer hover:bg-primary/10 dark:hover:bg-primary/20 text-base py-1.5 px-3 dark:border-primary/30 dark:text-gray-100 dark:bg-gray-800/80 hover:shadow-sm dark:hover:shadow-primary/10 transition-all"
               onClick={() => setPrompt(suggestion)}
             >
               {suggestion}
@@ -329,9 +329,9 @@ const LearningStudio = () => {
             </AnimatePresence>
           </div>
           
-          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <h3 className="font-medium mb-2">Instructions</h3>
-            <ul className="text-base text-gray-600 dark:text-gray-100 space-y-2">
+          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800/60 rounded-lg border border-gray-100 dark:border-gray-700/50">
+            <h3 className="font-medium mb-3 text-gray-800 dark:text-gray-100">Instructions</h3>
+            <ul className="text-base text-gray-600 dark:text-gray-300 space-y-2">
               <li>• Select an activity from the menu</li>
               <li>• Use your mouse or touch to draw</li>
               <li>• Change colors and brush size</li>
@@ -350,13 +350,13 @@ const LearningStudio = () => {
               />
               
               {!currentContent && (
-                <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-300">
+                <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-400">
                   <div className="text-center p-8">
-                    <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <Plus className="w-8 h-8" />
+                    <div className="bg-gray-100 dark:bg-gray-700/50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                      <Plus className="w-8 h-8 text-gray-600 dark:text-gray-300" />
                     </div>
-                    <h3 className="text-xl font-medium dark:text-white">Select something to trace</h3>
-                    <p className="text-base mt-2 dark:text-gray-300">Choose from the menu to get started</p>
+                    <h3 className="text-xl font-medium text-gray-800 dark:text-gray-100">Select something to trace</h3>
+                    <p className="text-base mt-2 text-gray-600 dark:text-gray-400">Choose from the menu to get started</p>
                   </div>
                 </div>
               )}
@@ -370,13 +370,13 @@ const LearningStudio = () => {
                   className="w-full h-full object-contain bg-white"
                 />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-300">
+                <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-400">
                   <div className="text-center p-8">
-                    <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <Sparkles className="w-8 h-8" />
+                    <div className="bg-gray-100 dark:bg-gray-700/50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                      <Sparkles className="w-8 h-8 text-gray-600 dark:text-primary-300" />
                     </div>
-                    <h3 className="text-2xl font-medium mb-3 dark:text-white">Generate a Coloring Page</h3>
-                    <p className="text-base dark:text-gray-300">Enter a description and click generate</p>
+                    <h3 className="text-2xl font-medium mb-3 text-gray-800 dark:text-gray-100">Generate a Coloring Page</h3>
+                    <p className="text-base text-gray-600 dark:text-gray-400">Enter a description and click generate</p>
                   </div>
                 </div>
               )}

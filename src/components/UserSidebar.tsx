@@ -19,7 +19,7 @@ export const UserSidebar = ({ isOpen, onClose }: UserSidebarProps) => {
   return (
     <div
       className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 transform bg-card/95 backdrop-blur-lg border-r border-border transition-transform duration-300 ease-in-out overflow-y-auto",
+        "fixed inset-y-0 left-0 z-50 w-64 transform bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out overflow-y-auto",
         "md:sticky md:top-16 md:h-[calc(100vh-4rem)] md:translate-x-0",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}
@@ -27,18 +27,18 @@ export const UserSidebar = ({ isOpen, onClose }: UserSidebarProps) => {
       <div className="flex flex-col h-full p-4">
         <div className="flex items-center justify-between mb-8 p-2">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center shadow-md">
               <span className="text-white font-bold text-lg">✦</span>
             </div>
-            <span className="text-xl font-bold text-foreground">My Workspace</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-gray-100">My Workspace</span>
           </div>
           <button
             onClick={onClose}
-            className="md:hidden p-1 rounded-md hover:bg-secondary/50 transition-colors"
+            className="md:hidden p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-muted-foreground"
+              className="h-5 w-5 text-gray-500 dark:text-gray-400"
               viewBox="0 0 20 20"
               fill="currentColor"
             >
@@ -60,16 +60,19 @@ export const UserSidebar = ({ isOpen, onClose }: UserSidebarProps) => {
                 cn(
                   "group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200",
                   isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                    ? "bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-300 font-semibold"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-white"
                 )
               }
               onClick={onClose}
             >
-              <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+              <item.icon className={cn(
+                "mr-3 h-5 w-5 flex-shrink-0",
+                "text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200"
+              )} />
               <span>{item.name}</span>
               {item.name === "My Library" && (
-                <span className="ml-auto inline-flex items-center justify-center h-5 px-2 text-xs font-semibold rounded-full bg-primary/10 text-primary">
+                <span className="ml-auto inline-flex items-center justify-center h-5 px-2 text-xs font-semibold rounded-full bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-300">
                   New
                 </span>
               )}
@@ -77,14 +80,15 @@ export const UserSidebar = ({ isOpen, onClose }: UserSidebarProps) => {
           ))}
         </nav>
 
-        <div className="mt-auto pt-4 border-t border-border">
+        <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-800">
           <div className="px-4 py-3">
-            <div className="text-xs font-medium text-muted-foreground mb-2">
-              Storage: 15% used
+            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 flex justify-between">
+              <span>Storage</span>
+              <span className="text-gray-700 dark:text-gray-300">15% used</span>
             </div>
-            <div className="w-full bg-secondary rounded-full h-2">
+            <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
               <div
-                className="bg-primary h-2 rounded-full"
+                className="bg-primary h-full rounded-full"
                 style={{ width: "15%" }}
               />
             </div>
