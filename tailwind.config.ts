@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-export default {
+const config: Config = {
 	darkMode: ["class", '[data-theme="dark"]'],
 	content: [
 		"./pages/**/*.{ts,tsx}",
@@ -64,11 +64,11 @@ export default {
 					foreground: 'hsl(var(--warning-foreground))'
 				},
 				cute: {
-					purple: 'hsl(var(--cute-purple))',
-					yellow: 'hsl(var(--cute-yellow))',
-					pink: 'hsl(var(--cute-pink))',
-					blue: 'hsl(var(--cute-blue))',
-					green: 'hsl(var(--cute-green))'
+					purple: '#A78BFA',
+					yellow: '#FBBF24',
+					pink: '#F472B6',
+					blue: '#60A5FA',
+					green: '#34D399',
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
@@ -102,13 +102,23 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				float: {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' },
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				float: 'float 4s ease-in-out infinite',
+			},
+			backgroundImage: {
+				'gradient-to-br': 'linear-gradient(to bottom right, var(--tw-gradient-stops))',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+
+export default config;

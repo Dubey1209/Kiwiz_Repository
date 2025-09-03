@@ -14,11 +14,11 @@ const TracingStudio = () => {
 
   const categories = [
     { id: "alphabet", name: "Alphabet", count: 26 },
-    { id: "numbers", name: "Numbers", count: 10 },
+    { id: "numbers", name: "Numbers", count: 15 },
   ];
 
   const alphabetItems = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-  const numberItems = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+  const numberItems = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10",];
 
   const getCurrentItems = () => {
     return activeCategory === "alphabet" ? alphabetItems : numberItems;

@@ -1,30 +1,45 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Palette, BookOpen, Upload, Star, Heart, Zap } from "lucide-react";
+import { ArrowRight, Star, Heart, Zap, Sparkles, MousePointerClick, BookOpen, Palette, Upload } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import heroCharacter from "@/assets/hero-character.png";
 import mascotLion from "@/assets/mascot-lion.png";
 import educationIcons from "@/assets/education-icons.png";
+import aiImages from "@/assets/AI_Images.png";
+import illustration from "@/assets/Illustration.png";
+import colorfulImage from "@/assets/interactive.png";
 
 const Home = () => {
   const features = [
     {
-      icon: BookOpen,
       title: "Interactive Letter & Number Tracing",
       description: "Help toddlers practice writing with guided tracing activities. Colorful letters and numbers with fun animations.",
-      gradient: "from-cute-blue to-cute-purple"
+      gradient: "from-blue-400 to-purple-500",
+      image: aiImages,
+      buttonText: "Start Tracing",
+      buttonIcon: <BookOpen className="w-5 h-5 mr-1" />,
+      accentColor: "#7C3AED",
+      decorations: ["✏️", "🔤", "123", "🎨"]
     },
     {
-      icon: Palette,
       title: "AI-Powered Coloring Pages",
       description: "Generate endless coloring pages instantly! Just describe what your child wants to color and watch the magic happen.",
-      gradient: "from-cute-pink to-cute-yellow"
+      gradient: "from-pink-400 to-yellow-400",
+      image: illustration,
+      buttonText: "Color Now",
+      buttonIcon: <Palette className="w-5 h-5 mr-1" />,
+      accentColor: "#F59E0B",
+      decorations: ["🌈", "🖍️", "🎯", "🌟"]
     },
     {
-      icon: Upload,
       title: "Transform Your Child's Art",
       description: "Upload your toddler's artwork and see it transformed into beautiful, enhanced illustrations they'll love to share.",
-      gradient: "from-cute-green to-cute-blue"
+      gradient: "from-green-400 to-blue-500",
+      image: colorfulImage,
+      buttonText: "Try It Out",
+      buttonIcon: <Upload className="w-5 h-5 mr-1" />,
+      accentColor: "#3B82F6",
+      decorations: ["🖼️", "🔮", "💫", "🎉"]
     }
   ];
 
@@ -143,15 +158,60 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {features.map((feature, index) => (
-              <Card key={index} className="cute-card group cursor-pointer fade-in-delay" style={{animationDelay: `${index * 0.2}s`}}>
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  <feature.icon className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground mb-3">{feature.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-              </Card>
+              <div 
+                key={index} 
+                className="relative group"
+                style={{ animationDelay: `${index * 0.2}s` }}
+              >
+                <Card className="h-full overflow-hidden border-2 border-transparent group/card">
+                  <div className="relative h-48 bg-gradient-to-br from-white to-gray-50 overflow-hidden image-container">
+                    <div className="absolute inset-0 flex items-center justify-center p-4">
+                      <img 
+                        src={feature.image} 
+                        alt={feature.title}
+                        className="h-full w-full object-contain transition-transform duration-700"
+                      />
+                    </div>
+                    <div className="image-overlay">
+                      <button className="hover-action">
+                        {feature.buttonText} →
+                      </button>
+                    </div>
+                    {/* Decorative elements */}
+                    {feature.decorations.map((emoji, i) => (
+                      <span 
+                        key={i}
+                        className="absolute text-2xl opacity-70"
+                        style={{
+                          top: `${10 + Math.random() * 70}%`,
+                          left: `${10 + Math.random() * 80}%`,
+                          transform: `rotate(${Math.random() * 60 - 30}deg)`,
+                          animation: `float ${3 + Math.random() * 4}s ease-in-out infinite`,
+                          animationDelay: `${Math.random() * 2}s`
+                        }}
+                      >
+                        {emoji}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-foreground mb-3 flex items-center">
+                      {feature.buttonIcon}
+                      {feature.title}
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed mb-4">{feature.description}</p>
+                    <Button 
+                      className="mt-4 hover:opacity-90 transition-opacity duration-300 flex items-center gap-2"
+                      style={{ backgroundColor: feature.accentColor }}
+                    >
+                      {feature.buttonText}
+                      <MousePointerClick className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </div>
+                </Card>
+              </div>
             ))}
           </div>
         </div>
