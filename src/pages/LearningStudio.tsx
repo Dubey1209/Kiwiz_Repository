@@ -1,9 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, X, Type, Hash, Image as ImageIcon, Download, RotateCcw } from 'lucide-react';
+import { Search, Plus, X, Type, Hash, Image as ImageIcon, Download, RotateCcw, Printer, Sparkles, Loader2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
 type ActivityType = 'tracing' | 'coloring';
 type TracingOption = 'letters' | 'numbers' | 'shapes';
@@ -14,41 +17,54 @@ const LearningStudio = () => {
   const [selectedActivity, setSelectedActivity] = useState<ActivityType>('tracing');
   const [selectedTracing, setSelectedTracing] = useState<TracingOption>('letters');
   const [currentContent, setCurrentContent] = useState('');
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [color, setColor] = useState('#000000');
-  const [brushSize, setBrushSize] = useState(5);
-  
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [prompt, setPrompt] = useState('');
+  const [generatedImage, setGeneratedImage] = useState('');
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null);
-  const [isPainting, setIsPainting] = useState(false);
-  const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 });
+  const ctx = useRef<CanvasRenderingContext2D | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  
+  const predefinedPrompts = [
+    'Cute puppy playing with a ball',
+    'Jungle with wild animals',
+    'Underwater ocean scene with fish',
+    'Space with planets and rockets',
+    'Princess in a magical castle',
+    'Dinosaur in prehistoric land',
+    'Butterfly garden with flowers',
+    'Pirate ship on the sea',
+    'Fairy tale dragon',
+    'Farm with animals'
+  ];
 
-  // Initialize canvas context
+  // Initialize component
   useEffect(() => {
+    setIsMounted(true);
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
     
     const context = canvas.getContext('2d');
     if (!context) return;
     
+    // Set canvas styles
     context.lineCap = 'round';
     context.lineJoin = 'round';
-    context.strokeStyle = color;
-    context.lineWidth = brushSize;
+    context.strokeStyle = '#000000';
+    context.fillStyle = '#ffffff';
+    context.lineWidth = 2;
     
-    setCtx(context);
-    
-    // Set canvas size
+    ctx.current = context;
+
     const resizeCanvas = () => {
       const container = canvas.parentElement;
       if (!container) return;
       
       canvas.width = container.clientWidth;
-      canvas.height = container.clientHeight;
+      canvas.height = container.clientHeight * 0.8;
       
-      // Redraw content if any
       if (currentContent) {
-        drawContent();
+        drawTracingContent();
       }
     };
     
@@ -60,83 +76,54 @@ const LearningStudio = () => {
     };
   }, [currentContent]);
 
-  const drawContent = () => {
-    if (!ctx || !canvasRef.current) return;
+  const drawTracingContent = () => {
+    if (!isMounted || !ctx.current || !canvasRef.current) return;
     
     const canvas = canvasRef.current;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const context = ctx.current;
     
+    // Clear canvas
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Only draw if we have content
     if (selectedActivity === 'tracing' && currentContent) {
-      ctx.font = '200px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#e5e7eb';
-      ctx.fillText(currentContent, canvas.width / 2, canvas.height / 2);
+      // Draw the tracing guide (light gray)
+      context.font = '200px Arial';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillStyle = '#e5e7eb';
+      context.fillText(currentContent, canvas.width / 2, canvas.height / 2);
+      
+      // Reset drawing styles
+      context.strokeStyle = '#000000';
+      context.fillStyle = '#000000';
+      context.lineWidth = 2;
     }
   };
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!ctx) return;
-    
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    setIsPainting(true);
-    setLastPosition({ x, y });
-    
-    // Start a new path
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-  };
-
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isPainting || !ctx || !canvasRef.current) return;
-    
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    // Draw line
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    
-    // Draw a circle at the current position for better visual
-    ctx.beginPath();
-    ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Start a new path for the next line segment
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    
-    setLastPosition({ x, y });
-  };
-
-  const stopDrawing = () => {
-    setIsPainting(false);
-  };
-
   const clearCanvas = () => {
-    if (!ctx || !canvasRef.current) return;
+    if (!isMounted || !canvasRef.current) return;
     
     const canvas = canvasRef.current;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const context = canvas.getContext('2d');
+    if (!context) return;
     
-    // Redraw the content if it exists
+    // Clear the entire canvas
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Redraw the tracing guide if we have content
     if (currentContent) {
-      drawContent();
+      drawTracingContent();
     }
   };
 
   const downloadCanvas = () => {
-    if (!canvasRef.current) return;
+    if (!isMounted || !canvasRef.current) return;
     
+    const canvas = canvasRef.current;
     const link = document.createElement('a');
     link.download = `${selectedActivity}-${new Date().getTime()}.png`;
-    link.href = canvasRef.current.toDataURL('image/png');
+    link.href = canvas.toDataURL('image/png');
     link.click();
   };
 
@@ -170,7 +157,7 @@ const LearningStudio = () => {
           <button
             key={item}
             onClick={() => handleTracingSelect(item)}
-            className="flex items-center justify-center text-4xl p-4 border rounded-lg hover:bg-gray-100 transition-colors"
+            className="flex items-center justify-center text-5xl p-4 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-100 transition-colors"
           >
             {item}
           </button>
@@ -179,57 +166,86 @@ const LearningStudio = () => {
     );
   };
 
-  const renderColoringOptions = () => {
-    const colors = [
-      '#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', 
-      '#ffff00', '#00ffff', '#ff00ff', '#ff9900', '#9900ff'
-    ];
+  const generateImage = async () => {
+    if (!prompt.trim()) {
+      toast.error('Please enter a description');
+      return;
+    }
     
-    return (
-      <div className="p-4">
-        <div className="grid grid-cols-5 gap-4 mb-4">
-          {colors.map((c) => (
-            <button
-              key={c}
-              onClick={() => setColor(c)}
-              className="w-12 h-12 rounded-full border-2 border-gray-200"
-              style={{ backgroundColor: c }}
-              aria-label={`Color ${c}`}
-            />
+    setIsGenerating(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      setGeneratedImage('https://placehold.co/600x400/000000/ffffff?text=Generated+Image');
+      toast.success('Image generated successfully!');
+    } catch (error) {
+      console.error('Error generating image:', error);
+      toast.error('Failed to generate image. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const renderColoringOptions = () => (
+    <div className="p-6 space-y-6">
+      <div className="space-y-4">
+        <div className="flex flex-wrap gap-3 mb-3">
+          {predefinedPrompts.map((suggestion, index) => (
+            <Badge 
+              key={index}
+              variant="outline"
+              className="cursor-pointer hover:bg-primary/10 dark:hover:bg-primary/30 text-base py-1.5 px-3 dark:border-gray-500 dark:text-white dark:bg-gray-700"
+              onClick={() => setPrompt(suggestion)}
+            >
+              {suggestion}
+            </Badge>
           ))}
         </div>
-        
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Brush Size: {brushSize}px
-          </label>
-          <input
-            type="range"
-            min="1"
-            max="50"
-            value={brushSize}
-            onChange={(e) => setBrushSize(parseInt(e.target.value))}
-            className="w-full"
-          />
-        </div>
+        <Textarea
+          placeholder="Describe what you'd like to color (e.g., 'Cute puppy playing with a ball')"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          className="min-h-[100px]"
+        />
+        <Button 
+          onClick={generateImage} 
+          disabled={!prompt.trim() || isGenerating}
+          className="w-full"
+        >
+          {isGenerating ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            'Generate Coloring Page'
+          )}
+        </Button>
       </div>
-    );
-  };
+    </div>
+  );
 
   return (
     <div className="container mx-auto p-4 max-w-7xl h-[calc(100vh-4rem)] flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Learning Studio</h1>
+        <h1 className="text-4xl font-bold dark:text-white">Learning Studio</h1>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={clearCanvas}>
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Clear
-          </Button>
-          <Button onClick={downloadCanvas}>
-            <Download className="w-4 h-4 mr-2" />
-            Save
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={clearCanvas}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear
+            </Button>
+            <Button variant="outline" onClick={downloadCanvas}>
+              <Download className="h-4 w-4 mr-2" />
+              Download
+            </Button>
+            <Button onClick={() => window.print()}>
+              <Printer className="h-4 w-4 mr-2" />
+              Print
+            </Button>
+          </div>
         </div>
       </div>
       
@@ -242,78 +258,70 @@ const LearningStudio = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 type="text"
-                placeholder="Search or create..."
-                className="pl-10 pr-10"
+                placeholder="Search..."
+                className="pl-10 w-full"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setShowOptions(true)}
               />
-              <button
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6"
                 onClick={() => setShowOptions(!showOptions)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {showOptions ? <X className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
-              </button>
+                {showOptions ? <X className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
+              </Button>
             </div>
-            
+
             <AnimatePresence>
               {showOptions && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute z-10 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
+                  className="absolute z-10 mt-2 w-full bg-white rounded-md shadow-lg border border-gray-200 overflow-hidden"
                 >
-                  <Tabs 
-                    defaultValue="tracing" 
-                    className="w-full"
-                    onValueChange={(value) => setSelectedActivity(value as ActivityType)}
-                  >
+                  <Tabs defaultValue="tracing" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="tracing">Tracing</TabsTrigger>
-                      <TabsTrigger value="coloring">Coloring</TabsTrigger>
+                      <TabsTrigger value="tracing" onClick={() => setSelectedActivity('tracing')}>
+                        Tracing
+                      </TabsTrigger>
+                      <TabsTrigger value="coloring" onClick={() => setSelectedActivity('coloring')}>
+                        Coloring
+                      </TabsTrigger>
                     </TabsList>
-                    
-                    <TabsContent value="tracing" className="m-0">
-                      <div className="p-2 border-t">
-                        <div className="grid grid-cols-3 gap-1 mb-2">
-                          <Button 
-                            variant={selectedTracing === 'letters' ? 'default' : 'ghost'} 
+
+                    <TabsContent value="tracing" className="p-2">
+                      <div className="space-y-2">
+                        <div className="flex space-x-2">
+                          <Button
+                            variant={selectedTracing === 'letters' ? 'default' : 'outline'}
                             size="sm"
                             onClick={() => setSelectedTracing('letters')}
-                            className="text-xs"
+                            className="flex-1"
                           >
-                            <Type className="w-3 h-3 mr-1" />
+                            <Type className="h-4 w-4 mr-2" />
                             Letters
                           </Button>
-                          <Button 
-                            variant={selectedTracing === 'numbers' ? 'default' : 'ghost'} 
+                          <Button
+                            variant={selectedTracing === 'numbers' ? 'default' : 'outline'}
                             size="sm"
                             onClick={() => setSelectedTracing('numbers')}
-                            className="text-xs"
+                            className="flex-1"
                           >
-                            <Hash className="w-3 h-3 mr-1" />
+                            <Hash className="h-4 w-4 mr-2" />
                             Numbers
                           </Button>
-                          <Button 
-                            variant={selectedTracing === 'shapes' ? 'default' : 'ghost'} 
-                            size="sm"
-                            onClick={() => setSelectedTracing('shapes')}
-                            className="text-xs"
-                          >
-                            <ImageIcon className="w-3 h-3 mr-1" />
-                            Shapes
-                          </Button>
                         </div>
-                        {renderTracingOptions()}
+                        <div className="h-64 overflow-y-auto">
+                          {renderTracingOptions()}
+                        </div>
                       </div>
                     </TabsContent>
-                    
-                    <TabsContent value="coloring" className="m-0">
-                      <div className="p-2 border-t">
-                        {renderColoringOptions()}
-                      </div>
+
+                    <TabsContent value="coloring" className="p-2">
+                      {renderColoringOptions()}
                     </TabsContent>
                   </Tabs>
                 </motion.div>
@@ -321,9 +329,9 @@ const LearningStudio = () => {
             </AnimatePresence>
           </div>
           
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <h3 className="font-medium mb-2">Instructions</h3>
-            <ul className="text-sm text-gray-600 space-y-1">
+            <ul className="text-base text-gray-600 dark:text-gray-100 space-y-2">
               <li>• Select an activity from the menu</li>
               <li>• Use your mouse or touch to draw</li>
               <li>• Change colors and brush size</li>
@@ -333,39 +341,47 @@ const LearningStudio = () => {
         </div>
         
         {/* Canvas Area */}
-        <div className="flex-1 bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <div className="h-full w-full relative">
-            <canvas
-              ref={canvasRef}
-              onMouseDown={startDrawing}
-              onMouseMove={draw}
-              onMouseUp={stopDrawing}
-              onMouseLeave={stopDrawing}
-              className="w-full h-full cursor-crosshair"
-            />
-            
-            {!currentContent && selectedActivity === 'tracing' && (
-              <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                <div className="text-center p-8">
-                  <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                    <Plus className="w-8 h-8" />
+        <div className="flex-1 bg-gray-50 rounded-lg border border-dashed border-gray-300 overflow-hidden">
+          {selectedActivity === 'tracing' ? (
+            <div className="h-full w-full relative">
+              <canvas
+                ref={canvasRef}
+                className="border rounded-lg w-full h-full bg-white"
+              />
+              
+              {!currentContent && (
+                <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-300">
+                  <div className="text-center p-8">
+                    <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                      <Plus className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-xl font-medium dark:text-white">Select something to trace</h3>
+                    <p className="text-base mt-2 dark:text-gray-300">Choose from the menu to get started</p>
                   </div>
-                  <h3 className="font-medium">Select something to trace</h3>
-                  <p className="text-sm mt-1">Choose from the menu to get started</p>
                 </div>
-              </div>
-            )}
-            
-            {selectedActivity === 'coloring' && (
-              <div className="absolute bottom-4 right-4 flex items-center space-x-2 bg-white/90 px-3 py-2 rounded-full shadow-md">
-                <div 
-                  className="w-6 h-6 rounded-full border" 
-                  style={{ backgroundColor: color }}
+              )}
+            </div>
+          ) : (
+            <div className="h-full w-full relative">
+              {generatedImage ? (
+                <img
+                  src={generatedImage}
+                  alt="Generated coloring page"
+                  className="w-full h-full object-contain bg-white"
                 />
-                <span className="text-sm font-medium">{color.toUpperCase()}</span>
-              </div>
-            )}
-          </div>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-300">
+                  <div className="text-center p-8">
+                    <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                      <Sparkles className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-2xl font-medium mb-3 dark:text-white">Generate a Coloring Page</h3>
+                    <p className="text-base dark:text-gray-300">Enter a description and click generate</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

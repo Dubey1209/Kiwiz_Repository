@@ -11,8 +11,7 @@ export const UserSidebar = ({ isOpen, onClose }: UserSidebarProps) => {
   const navItems = [
     { name: "Home", href: "/", icon: Home },
     { name: "My Library", href: "/library", icon: Heart },
-    { name: "Tracing Studio", href: "/tracing", icon: BookOpen },
-    { name: "AI Coloring", href: "/coloring", icon: Palette },
+    { name: "Learning Studio", href: "/studio", icon: BookOpen },
     { name: "Upload & Illustrate", href: "/upload", icon: Upload },
     { name: "Explore Gallery", href: "/explore", icon: Image },
   ];
