@@ -28,8 +28,7 @@ const Layout = () => {
   // Navigation items for all users (desktop)
   const publicNavigation = [
     { name: "Home", href: "/" },
-    { name: "Tracing Studio", href: "/tracing" },
-    { name: "AI Coloring", href: "/coloring" },
+    { name: "Learning Studio", href: "/studio" },
     { name: "Explore", href: "/explore" },
   ];
 

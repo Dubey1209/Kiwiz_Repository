@@ -84,7 +84,7 @@ const Home = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <NavLink to="/tracing">
+                <NavLink to="/studio">
                   <Button className="cute-button text-lg px-8 py-4">
                     Start Learning
                     <ArrowRight className="ml-2 w-5 h-5" />
@@ -268,7 +268,7 @@ const Home = () => {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <NavLink to="/tracing">
+              <NavLink to="/studio">
                 <Button className="cute-button text-lg px-8 py-4">
                   Start Free Trial
                   <ArrowRight className="ml-2 w-5 h-5" />

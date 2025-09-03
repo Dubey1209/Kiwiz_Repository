@@ -8,8 +8,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
-import TracingStudio from "./pages/TracingStudio";
-import ColoringGenerator from "./pages/ColoringGenerator";
+import LearningStudio from "./pages/LearningStudio";
 import UploadIllustrate from "./pages/UploadIllustrate";
 import ExploreGallery from "./pages/ExploreGallery";
 import MyLibrary from "./pages/MyLibrary";
@@ -30,8 +29,7 @@ const AppRoutes = () => {
       <Route path="/" element={<Layout />}>
         {/* Public Routes */}
         <Route index element={<Home />} />
-        <Route path="tracing" element={<TracingStudio />} />
-        <Route path="coloring" element={<ColoringGenerator />} />
+        <Route path="studio" element={<LearningStudio />} />
         <Route path="explore" element={<ExploreGallery />} />
         <Route path="pricing" element={<BillingPlans />} />
         <Route path="contact" element={<ContactUs />} />
