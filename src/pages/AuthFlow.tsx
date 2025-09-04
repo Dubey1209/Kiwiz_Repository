@@ -27,7 +27,7 @@ const AuthFlow = () => {
     setAuthMethod(method);
     
     if (method === 'email') {
-      // For email, we'll show the email input first
+      // For email, we'll show the profile form with email and password fields
       setFlowStep('profile');
     } else if (method === 'google' || method === 'apple') {
       // For social auth, simulate successful auth and move to profile
@@ -56,7 +56,8 @@ const AuthFlow = () => {
     setTempProfileData(profileData);
     
     if (authMethod === 'email') {
-      // For email signup, proceed to email verification
+      // For email signup, update the email state and proceed to verification
+      setEmail(profileData.email);
       setFlowStep('verification');
     } else {
       // For social auth, create account directly

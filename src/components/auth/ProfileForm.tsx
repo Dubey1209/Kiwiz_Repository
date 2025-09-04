@@ -16,6 +16,8 @@ interface ProfileFormProps {
 export interface ProfileData {
   firstName: string;
   lastName: string;
+  email: string;
+  password: string;
   kidAge: string;
   kidGender: string;
   state: string;
@@ -23,13 +25,16 @@ export interface ProfileData {
 }
 
 const ProfileForm = ({ email, authMethod, onComplete, onBack }: ProfileFormProps) => {
-  const [formData, setFormData] = useState<Omit<ProfileData, 'kidAge'>>({
+  const [formData, setFormData] = useState<Omit<ProfileData, 'kidAge' | 'email' | 'password'>>({
     firstName: '',
     lastName: '',
     kidGender: '',
     state: '',
     country: '',
   });
+  const [emailInput, setEmailInput] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [kidAge, setKidAge] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -49,17 +54,58 @@ const ProfileForm = ({ email, authMethod, onComplete, onBack }: ProfileFormProps
     }));
   };
 
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const validatePassword = (password: string) => {
+    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
+    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return re.test(password);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
     if (!formData.firstName.trim() || !formData.lastName.trim() || !kidAge || 
-        !formData.kidGender || !formData.state || !formData.country) {
+        !formData.kidGender || !formData.state || !formData.country || 
+        (authMethod === 'email' && (!emailInput || !password || !confirmPassword))) {
       toast({
         title: "Please fill in all required fields",
         variant: "destructive"
       });
       return;
+    }
+
+    // Email validation for email signup
+    if (authMethod === 'email' && !validateEmail(emailInput)) {
+      toast({
+        title: "Please enter a valid email address",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Password validation for email signup
+    if (authMethod === 'email') {
+      if (password !== confirmPassword) {
+        toast({
+          title: "Passwords do not match",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (!validatePassword(password)) {
+        toast({
+          title: "Password requirements not met",
+          description: "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character (@$!%*?&)",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     const ageNumber = parseInt(kidAge, 10);
@@ -77,6 +123,8 @@ const ProfileForm = ({ email, authMethod, onComplete, onBack }: ProfileFormProps
     setTimeout(() => {
       onComplete({
         ...formData,
+        email: authMethod === 'email' ? emailInput : email, // Use the email from state for email signup, or the prop for social
+        password: authMethod === 'email' ? password : '', // Only set password for email signup
         kidAge: kidAge
       });
       setIsLoading(false);
@@ -98,6 +146,46 @@ const ProfileForm = ({ email, authMethod, onComplete, onBack }: ProfileFormProps
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {authMethod === 'email' && (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address *</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password *</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Create a strong password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Must be at least 8 characters with uppercase, lowercase, number, and special character
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password *</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+          </>
+        )}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="firstName">First Name *</Label>

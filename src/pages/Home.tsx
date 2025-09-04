@@ -19,7 +19,7 @@ const Home = () => {
       buttonText: "Start Tracing",
       buttonIcon: <BookOpen className="w-5 h-5 mr-1" />,
       accentColor: "#7C3AED",
-      decorations: ["✏️", "🔤", "123", "🎨"]
+      decorations: ["✏️", "123", "🎨"]
     },
     {
       title: "AI-Powered Coloring Pages",
@@ -160,24 +160,41 @@ const Home = () => {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {features.map((feature, index) => (
-              <div 
-                key={index} 
-                className="relative group"
+              <NavLink 
+                key={index}
+                to={index < 2 ? "/studio" : "/explore"}
+                onClick={(e) => {
+                  if (index === 2) {
+                    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+                    if (!isAuthenticated) {
+                      e.preventDefault();
+                      window.location.href = '/login?returnTo=/explore';
+                      return;
+                    }
+                  }
+                }}
+                className="relative group block h-full"
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
-                <Card className="h-full overflow-hidden border-2 border-transparent group/card">
-                  <div className="relative h-48 bg-gradient-to-br from-white to-gray-50 overflow-hidden image-container">
+                <Card className="h-full overflow-hidden border-2 border-transparent group-hover:border-primary/50 transition-all duration-300">
+                  <div className="relative h-64 bg-gradient-to-br from-white to-gray-50 overflow-hidden">
                     <div className="absolute inset-0 flex items-center justify-center p-4">
                       <img 
                         src={feature.image} 
                         alt={feature.title}
-                        className="h-full w-full object-contain transition-transform duration-700"
+                        className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                        style={{
+                          width: 'auto',
+                          height: 'auto',
+                          maxHeight: '100%',
+                          padding: '0.5rem'
+                        }}
                       />
                     </div>
-                    <div className="image-overlay">
-                      <button className="hover-action">
+                    <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <span className="text-white text-xl font-medium">
                         {feature.buttonText} →
-                      </button>
+                      </span>
                     </div>
                     {/* Decorative elements */}
                     {feature.decorations.map((emoji, i) => (
@@ -202,16 +219,12 @@ const Home = () => {
                       {feature.title}
                     </h3>
                     <p className="text-muted-foreground leading-relaxed mb-4">{feature.description}</p>
-                    <Button 
-                      className="mt-4 hover:opacity-90 transition-opacity duration-300 flex items-center gap-2"
-                      style={{ backgroundColor: feature.accentColor }}
-                    >
-                      {feature.buttonText}
-                      <MousePointerClick className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
+                    <div className="mt-4 px-4 py-2 bg-primary/10 text-primary rounded-lg text-center font-medium">
+                      {feature.buttonText} →
+                    </div>
                   </div>
                 </Card>
-              </div>
+              </NavLink>
             ))}
           </div>
         </div>
@@ -267,15 +280,15 @@ const Home = () => {
                 Join thousands of families who are making learning fun, engaging, and memorable for their toddlers.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <NavLink to="/studio">
-                <Button className="cute-button text-lg px-8 py-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+              <NavLink to="/studio" className="w-full sm:w-auto">
+                <Button className="cute-button text-lg w-full sm:w-auto px-8 py-4">
                   Start Free Trial
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </NavLink>
-              <NavLink to="/billing">
-                <Button className="cute-button-secondary text-lg px-8 py-4">
+              <NavLink to="/pricing" className="w-full sm:w-auto">
+                <Button className="cute-button-secondary text-lg w-full sm:w-auto px-8 py-4">
                   View Plans
                 </Button>
               </NavLink>

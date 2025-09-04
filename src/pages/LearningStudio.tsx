@@ -349,17 +349,7 @@ const LearningStudio = () => {
                 className="border rounded-lg w-full h-full bg-white"
               />
               
-              {!currentContent && (
-                <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-400">
-                  <div className="text-center p-8">
-                    <div className="bg-gray-100 dark:bg-gray-700/50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <Plus className="w-8 h-8 text-gray-600 dark:text-gray-300" />
-                    </div>
-                    <h3 className="text-xl font-medium text-gray-800 dark:text-gray-100">Select something to trace</h3>
-                    <p className="text-base mt-2 text-gray-600 dark:text-gray-400">Choose from the menu to get started</p>
-                  </div>
-                </div>
-              )}
+              {!currentContent && <div className="absolute inset-0" />}
             </div>
           ) : (
             <div className="h-full w-full relative">

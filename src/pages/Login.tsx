@@ -17,8 +17,10 @@ const Login = () => {
   const location = useLocation();
   const { login } = useAuth();
   
-  // Get the previous location or default to the home page
-  const from = location.state?.from?.pathname || "/";
+  // Get the return URL from query parameters or state
+  const searchParams = new URLSearchParams(location.search);
+  const returnTo = searchParams.get('returnTo');
+  const from = returnTo || location.state?.from?.pathname || "/";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,7 +166,7 @@ const Login = () => {
 
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{' '}
-              <NavLink to="/signup" className="text-primary font-medium hover:underline">
+              <NavLink to="/auth" className="text-primary font-medium hover:underline">
                 Sign up
               </NavLink>
             </p>
