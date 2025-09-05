@@ -1,21 +1,22 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Type, 
   Hash, 
-  Download, 
+  Star, 
+  Lightbulb, 
   RotateCcw, 
+  Download, 
   Sparkles, 
-  Loader2, 
-  PenTool, 
+  Loader2,
   BookOpen,
-  Star,
+  Zap,
   Palette,
   PencilRuler,
   Sparkles as SparklesIcon,
-  Zap,
-  Smile,
-  Lightbulb
+  PenTool,
+  Printer,
+  Smile
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -47,6 +48,62 @@ const LearningStudio = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState('');
   const [currentTracingItem, setCurrentTracingItem] = useState('A');
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [activeFeature, setActiveFeature] = useState(0);
+  
+  const handlePrint = () => {
+    const printWindow = window.open('', '', 'width=800,height=600');
+    if (printWindow) {
+      const content = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Print</title>
+            <style>
+              @page { margin: 0; }
+              body { 
+                margin: 1.6cm;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                font-family: Arial, sans-serif;
+              }
+              .print-content {
+                text-align: center;
+              }
+              .character {
+                font-size: 200px;
+                margin-bottom: 20px;
+              }
+              .instructions {
+                font-size: 24px;
+                margin-top: 40px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="print-content">
+              <div class="character">${currentTracingItem}</div>
+              <div class="instructions">Trace the ${selectedTracing === 'letters' ? 'letter' : 'number'} above</div>
+            </div>
+            <script>
+              window.onload = function() {
+                window.print();
+                window.onafterprint = function() {
+                  window.close();
+                }
+              }
+            </script>
+          </body>
+        </html>
+      `;
+      printWindow.document.open();
+      printWindow.document.write(content);
+      printWindow.document.close();
+    }
+  };
   
   // Pre-written prompts for coloring
   const preWrittenPrompts = [
@@ -84,8 +141,6 @@ const LearningStudio = () => {
         return [];
     }
   };
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [activeFeature, setActiveFeature] = useState(0);
   
   const features = [
     {
@@ -127,19 +182,42 @@ const LearningStudio = () => {
     }
   };
 
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    
+    // Check if the search query is a single character (likely for tracing)
+    if (searchQuery.length === 1 && /[A-Za-z0-9]/.test(searchQuery)) {
+      setSelectedActivity('tracing');
+      setSelectedTracing(/\d/.test(searchQuery) ? 'numbers' : 'letters');
+      setCurrentTracingItem(searchQuery.toUpperCase());
+    } else {
+      // For longer queries, treat as coloring page request
+      setSelectedActivity('coloring');
+      setPrompt(searchQuery);
+      // Auto-generate if there's a prompt
+      if (searchQuery.trim().length > 0) {
+        handleGenerateColoringPage();
+      }
+    }
+  };
+
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50">
-      <header className="bg-white/80 backdrop-blur-sm border-b border-indigo-100 shadow-sm">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
+      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-indigo-100 dark:border-gray-700 shadow-sm">
         <div className="container flex items-center h-16 px-4">
           <div className="flex items-center space-x-4">
             <PenTool className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold">Learning Studio</h1>
+            <h1 className="text-xl font-bold dark:text-white">Learning Studio</h1>
           </div>
           <div className="ml-auto flex items-center space-x-4">
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => setShowTutorial(!showTutorial)}
+              className="dark:text-white dark:hover:bg-gray-700"
             >
               <BookOpen className="h-5 w-5" />
               <span className="sr-only">Tutorial</span>
@@ -148,8 +226,65 @@ const LearningStudio = () => {
         </div>
       </header>
 
-      <main className="flex-1 container py-8 px-4">
-        <div className="max-w-4xl mx-auto">
+      <main className="flex-1 container py-4 px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Hero Section with Search */}
+          <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
+            <div className="space-y-4">
+              <motion.h1 
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white"
+              >
+                Learn Through <span className="bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">Creativity</span>
+              </motion.h1>
+              <p className="text-lg text-gray-600 dark:text-gray-300">
+                Interactive learning with tracing and coloring activities for all ages.
+              </p>
+              
+              {/* Search Bar */}
+              <form onSubmit={handleSearch} className="relative mt-6">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search letters, numbers, or describe a scene..."
+                  className="w-full px-6 py-3 text-base border-2 border-indigo-100 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 shadow-sm dark:bg-gray-800 dark:text-white"
+                />
+                <button 
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white p-2 rounded-xl hover:bg-indigo-700 transition-colors"
+                  aria-label="Search"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+              </form>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                Try: "A", "5", "dinosaur", or "castle"
+              </p>
+            </div>
+            
+            {/* Feature Highlights */}
+            <div className="grid grid-cols-2 gap-4">
+              {features.map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mb-3">
+                    {React.cloneElement(feature.icon, { className: 'w-5 h-5' })}
+                  </div>
+                  <h3 className="font-medium text-gray-900 dark:text-white">{feature.title}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{feature.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
           <div className="text-center mb-12">
             <motion.h1 
               initial={{ y: -10, opacity: 0 }}
@@ -188,25 +323,25 @@ const LearningStudio = () => {
             ))}
           </div>
           
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
             <Tabs 
               value={selectedActivity} 
               onValueChange={(value) => setSelectedActivity(value as ActivityType)}
-              className="space-y-4"
+              className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto bg-indigo-50 p-1 rounded-xl m-6">
+              <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-6 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
                 <TabsTrigger 
                   value="tracing" 
-                  className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 rounded-lg"
+                  className="flex items-center gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-700"
                 >
-                  <PencilRuler className="w-4 h-4 mr-2" />
+                  <Type className="h-4 w-4" />
                   Tracing
                 </TabsTrigger>
                 <TabsTrigger 
                   value="coloring" 
-                  className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-pink-600 rounded-lg"
+                  className="flex items-center gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-700"
                 >
-                  <Palette className="w-4 h-4 mr-2" />
+                  <Palette className="h-4 w-4" />
                   Coloring
                 </TabsTrigger>
               </TabsList>
@@ -229,6 +364,13 @@ const LearningStudio = () => {
                         <Button variant="outline" size="sm" className="rounded-full">
                           <Star className="w-4 h-4 mr-1 text-yellow-500" />
                           Save
+                        </Button>
+                        <Button 
+                          onClick={handlePrint}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl px-6 py-6 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-indigo-200"
+                        >
+                          <Printer className="mr-2 h-5 w-5" />
+                          Print
                         </Button>
                       </div>
                     </div>
@@ -318,16 +460,15 @@ const LearningStudio = () => {
                           ref={canvasRef}
                           className="absolute inset-0 w-full h-full rounded-xl opacity-70 cursor-crosshair"
                         />
-                        <div className="mt-4 flex justify-between">
-                          <Button variant="outline" size="sm">
-                            <RotateCcw className="mr-2 h-4 w-4" />
-                            Clear
-                          </Button>
-                          <Button size="sm">
-                            <Download className="mr-2 h-4 w-4" />
-                            Save
-                          </Button>
-                        </div>
+                      </div>
+                      <div className="mt-6 flex justify-center">
+                        <Button 
+                          onClick={handlePrint}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl px-8 py-6 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-indigo-200"
+                        >
+                          <Printer className="mr-2 h-5 w-5" />
+                          Print
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -474,6 +615,11 @@ const LearningStudio = () => {
           </div>
         </div>
       </main>
+      <footer className="py-6 border-t border-gray-100 dark:border-gray-800 mt-8">
+        <div className="container mx-auto px-4 text-center text-sm text-gray-500 dark:text-gray-400">
+          <p>© {new Date().getFullYear()} Learning Studio. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 };
