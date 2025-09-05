@@ -8,7 +8,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
-import LearningStudio from "./pages/LearningStudio";
+import LearningStudio from "./pages/LearningStudio.new";
 import UploadIllustrate from "./pages/UploadIllustrate";
 import ExploreGallery from "./pages/ExploreGallery";
 import MyLibrary from "./pages/MyLibrary";
@@ -79,17 +79,21 @@ const AppRoutes = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <ThemeProvider>
-        <AuthProvider>
-          <BrowserRouter>
+    <ThemeProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}>
             <AppRoutes />
           </BrowserRouter>
-        </AuthProvider>
-      </ThemeProvider>
-    </TooltipProvider>
+        </TooltipProvider>
+      </AuthProvider>
+    </ThemeProvider>
+    <Toaster />
+    <Sonner position="top-right" />
   </QueryClientProvider>
 );
 

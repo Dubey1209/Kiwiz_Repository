@@ -1,25 +1,50 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, X, Type, Hash, Image as ImageIcon, Download, RotateCcw, Printer, Sparkles, Loader2, Trash2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { 
+  Search, 
+  Type, 
+  Hash, 
+  Download, 
+  RotateCcw, 
+  Sparkles, 
+  Loader2, 
+  PenTool, 
+  PaintBucket, 
+  ArrowRight, 
+  BookOpen 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
 type ActivityType = 'tracing' | 'coloring';
 type TracingOption = 'letters' | 'numbers' | 'shapes';
 
-const LearningStudio = () => {
+const LearningStudio: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [showOptions, setShowOptions] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<ActivityType>('tracing');
   const [selectedTracing, setSelectedTracing] = useState<TracingOption>('letters');
   const [currentContent, setCurrentContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [generatedImage, setGeneratedImage] = useState('');
+  const [showTutorial, setShowTutorial] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctx = useRef<CanvasRenderingContext2D | null>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -227,116 +252,106 @@ const LearningStudio = () => {
   );
 
   return (
-    <div className="container mx-auto p-4 max-w-7xl h-[calc(100vh-4rem)] flex flex-col">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-4xl font-bold dark:text-white">Learning Studio</h1>
-        <div className="flex items-center space-x-2">
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={clearCanvas}>
-              <Trash2 className="h-4 w-4 mr-2" />
-              Clear
-            </Button>
-            <Button variant="outline" onClick={downloadCanvas}>
-              <Download className="h-4 w-4 mr-2" />
-              Download
-            </Button>
-            <Button onClick={() => window.print()}>
-              <Printer className="h-4 w-4 mr-2" />
-              Print
+      <header className="border-b">
+        <div className="container flex items-center h-16 px-4">
+          <div className="flex items-center space-x-4">
+            <PenTool className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold">Learning Studio</h1>
+          </div>
+          <div className="ml-auto flex items-center space-x-4">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setShowTutorial(!showTutorial)}
+            >
+              <BookOpen className="h-5 w-5" />
+              <span className="sr-only">Tutorial</span>
             </Button>
           </div>
         </div>
-      </div>
-      
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col md:flex-row gap-6">
-        {/* Sidebar */}
-        <div className="w-full md:w-64 flex-shrink-0">
-          <div className="relative">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search..."
-                className="pl-10 w-full"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setShowOptions(true)}
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6"
-                onClick={() => setShowOptions(!showOptions)}
-              >
-                {showOptions ? <X className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
-              </Button>
-            </div>
+      </header>
 
-            <AnimatePresence>
-              {showOptions && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute z-10 mt-2 w-full bg-white rounded-md shadow-lg border border-gray-200 overflow-hidden"
-                >
-                  <Tabs defaultValue="tracing" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="tracing" onClick={() => setSelectedActivity('tracing')}>
-                        Tracing
-                      </TabsTrigger>
-                      <TabsTrigger value="coloring" onClick={() => setSelectedActivity('coloring')}>
-                        Coloring
-                      </TabsTrigger>
-                    </TabsList>
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4">Welcome to Learning Studio</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Explore fun learning activities designed for your little ones
+          </p>
+        </div>
 
-                    <TabsContent value="tracing" className="p-2">
-                      <div className="space-y-2">
-                        <div className="flex space-x-2">
-                          <Button
-                            variant={selectedTracing === 'letters' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setSelectedTracing('letters')}
-                            className="flex-1"
-                          >
-                            <Type className="h-4 w-4 mr-2" />
-                            Letters
-                          </Button>
-                          <Button
-                            variant={selectedTracing === 'numbers' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setSelectedTracing('numbers')}
-                            className="flex-1"
-                          >
-                            <Hash className="h-4 w-4 mr-2" />
-                            Numbers
-                          </Button>
-                        </div>
-                        <div className="h-64 overflow-y-auto">
-                          {renderTracingOptions()}
-                        </div>
+        <Tabs 
+          value={selectedActivity} 
+          onValueChange={(value) => setSelectedActivity(value as ActivityType)}
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8">
+            <TabsTrigger value="tracing" className="flex items-center gap-2">
+              <PenTool className="w-4 h-4" />
+              Tracing
+            </TabsTrigger>
+            <TabsTrigger value="coloring" className="flex items-center gap-2">
+              <PaintBucket className="w-4 h-4" />
+              Coloring
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="tracing" className="mt-0">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Left Sidebar - Tracing Options */}
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Tracing Options</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium">Category</h4>
+                      <div className="grid grid-cols-3 gap-2">
+                        <Button 
+                          variant={selectedTracing === 'letters' ? 'default' : 'outline'} 
+                          onClick={() => setSelectedTracing('letters')}
+                          size="sm"
+                          className="gap-1"
+                        >
+                          <Type className="w-3.5 h-3.5" />
+                          Letters
+                        </Button>
+                        <Button 
+                          variant={selectedTracing === 'numbers' ? 'default' : 'outline'} 
+                          onClick={() => setSelectedTracing('numbers')}
+                          size="sm"
+                          className="gap-1"
+                        >
+                          <Hash className="w-3.5 h-3.5" />
+                          Numbers
+                        </Button>
+                        <Button 
+                          variant={selectedTracing === 'shapes' ? 'default' : 'outline'} 
+                          onClick={() => setSelectedTracing('shapes')}
+                          size="sm"
+                          className="gap-1"
+                        >
+                          <span className="text-sm">◇</span>
+                          Shapes
+                        </Button>
                       </div>
-                    </TabsContent>
-
-                    <TabsContent value="coloring" className="p-2">
-                      {renderColoringOptions()}
-                    </TabsContent>
-                  </Tabs>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          
-          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800/60 rounded-lg border border-gray-100 dark:border-gray-700/50">
-            <h3 className="font-medium mb-3 text-gray-800 dark:text-gray-100">Instructions</h3>
-            <ul className="text-base text-gray-600 dark:text-gray-300 space-y-2">
-              <li>• Select an activity from the menu</li>
-              <li>• Use your mouse or touch to draw</li>
-              <li>• Change colors and brush size</li>
-              <li>• Save your work when done</li>
-            </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="font-medium text-gray-800 dark:text-gray-100">Instructions</h3>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
+                  <li>• Select an activity from the menu</li>
+                  <li>• Use your mouse or touch to draw</li>
+                  <li>• Change colors and brush size</li>
+                  <li>• Save your work when done</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -374,6 +389,302 @@ const LearningStudio = () => {
           )}
         </div>
       </div>
+    </div>
+  );
+};
+
+  const handleGenerateColoringPage = async () => {
+    try {
+      setIsGenerating(true);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // In a real app, this would be the response from your API
+      setGeneratedImage('https://via.placeholder.com/500x500?text=AI+Generated+Coloring+Page');
+      
+      toast.success('Coloring page generated successfully!');
+    } catch (error) {
+      console.error('Error generating coloring page:', error);
+      toast.error('Failed to generate coloring page. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b">
+        <div className="container flex items-center h-16 px-4">
+          <div className="flex items-center space-x-4">
+            <PenTool className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold">Learning Studio</h1>
+          </div>
+          <div className="ml-auto flex items-center space-x-4">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setShowTutorial(!showTutorial)}
+            >
+              <BookOpen className="h-5 w-5" />
+              <span className="sr-only">Tutorial</span>
+            </Button>
+          </div>
+        </div>
+      </header>
+      
+      <main className="flex-1 container py-8">
+        <Tabs 
+          value={selectedActivity} 
+          onValueChange={(value) => setSelectedActivity(value as ActivityType)}
+          className="space-y-4"
+        >
+          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+            <TabsTrigger value="tracing">Tracing</TabsTrigger>
+            <TabsTrigger value="coloring">Coloring</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="tracing">
+            <Card>
+              <CardHeader>
+                <CardTitle>Tracing Activity</CardTitle>
+                <CardDescription>
+                  Practice tracing letters, numbers, and shapes
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant={selectedTracing === 'letters' ? 'default' : 'outline'}
+                      onClick={() => setSelectedTracing('letters')}
+                    >
+                      <Type className="mr-2 h-4 w-4" />
+                      Letters
+                    </Button>
+                    <Button 
+                      variant={selectedTracing === 'numbers' ? 'default' : 'outline'}
+                      onClick={() => setSelectedTracing('numbers')}
+                    >
+                      <Hash className="mr-2 h-4 w-4" />
+                      Numbers
+                    </Button>
+                    <Button 
+                      variant={selectedTracing === 'shapes' ? 'default' : 'outline'}
+                      onClick={() => setSelectedTracing('shapes')}
+                    >
+                      <PenTool className="mr-2 h-4 w-4" />
+                      Shapes
+                    </Button>
+                  </div>
+                  
+                  <div className="border rounded-lg p-4 bg-white">
+                    <canvas
+                      ref={canvasRef}
+                      className="w-full h-64 border rounded"
+                    />
+                    <div className="mt-4 flex justify-between">
+                      <Button variant="outline" size="sm">
+                        <RotateCcw className="mr-2 h-4 w-4" />
+                        Clear
+                      </Button>
+                      <Button size="sm">
+                        <Download className="mr-2 h-4 w-4" />
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="coloring">
+            <Card>
+              <CardHeader>
+                <CardTitle>Coloring Activity</CardTitle>
+                <CardDescription>
+                  Generate coloring pages with AI
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Textarea
+                      placeholder="Describe the coloring page you'd like to create..."
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      className="min-h-[100px]"
+                    />
+                    <div className="flex justify-end">
+                      <Button 
+                        onClick={handleGenerateColoringPage}
+                        disabled={isGenerating || !prompt.trim()}
+                      >
+                        {isGenerating ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Generate
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {generatedImage && (
+                    <div className="border rounded-lg p-4 bg-white">
+                      <img 
+                        src={generatedImage} 
+                        alt="Generated coloring page" 
+                        className="w-full h-auto border rounded"
+                      />
+                      <div className="mt-4 flex justify-end">
+                        <Button size="sm">
+                          <Download className="mr-2 h-4 w-4" />
+                          Download
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </main>
+    </div>
+  );
+};
+
+      <main className="flex-1 container py-8">
+        <Tabs 
+          value={selectedActivity} 
+          onValueChange={(value) => setSelectedActivity(value as ActivityType)}
+          className="space-y-4"
+        >
+          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+            <TabsTrigger value="tracing">Tracing</TabsTrigger>
+            <TabsTrigger value="coloring">Coloring</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="tracing">
+            <Card>
+              <CardHeader>
+                <CardTitle>Tracing Activity</CardTitle>
+                <CardDescription>
+                  Practice tracing letters, numbers, and shapes
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant={selectedTracing === 'letters' ? 'default' : 'outline'}
+                      onClick={() => setSelectedTracing('letters')}
+                    >
+                      <Type className="mr-2 h-4 w-4" />
+                      Letters
+                    </Button>
+                    <Button 
+                      variant={selectedTracing === 'numbers' ? 'default' : 'outline'}
+                      onClick={() => setSelectedTracing('numbers')}
+                    >
+                      <Hash className="mr-2 h-4 w-4" />
+                      Numbers
+                    </Button>
+                    <Button 
+                      variant={selectedTracing === 'shapes' ? 'default' : 'outline'}
+                      onClick={() => setSelectedTracing('shapes')}
+                    >
+                      <PenTool className="mr-2 h-4 w-4" />
+                      Shapes
+                    </Button>
+                  </div>
+                  
+                  <div className="border rounded-lg p-4 bg-white">
+                    <canvas
+                      ref={canvasRef}
+                      className="w-full h-64 border rounded"
+                    />
+                    <div className="mt-4 flex justify-between">
+                      <Button variant="outline" size="sm">
+                        <RotateCcw className="mr-2 h-4 w-4" />
+                        Clear
+                      </Button>
+                      <Button size="sm">
+                        <Download className="mr-2 h-4 w-4" />
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="coloring">
+            <Card>
+              <CardHeader>
+                <CardTitle>Coloring Activity</CardTitle>
+                <CardDescription>
+                  Generate coloring pages with AI
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Textarea
+                      placeholder="Describe the coloring page you'd like to create..."
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      className="min-h-[100px]"
+                    />
+                    <div className="flex justify-end">
+                      <Button 
+                        onClick={handleGenerateColoringPage}
+                        disabled={isGenerating || !prompt.trim()}
+                      >
+                        {isGenerating ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Generate
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {generatedImage && (
+                    <div className="border rounded-lg p-4 bg-white">
+                      <img 
+                        src={generatedImage} 
+                        alt="Generated coloring page" 
+                        className="w-full h-auto border rounded"
+                      />
+                      <div className="mt-4 flex justify-end">
+                        <Button size="sm">
+                          <Download className="mr-2 h-4 w-4" />
+                          Download
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
   );
 };
